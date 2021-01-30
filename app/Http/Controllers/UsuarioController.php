@@ -3,62 +3,72 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Models\Usuario;
-use App\Models\Partida;
+use Illuminate\Http\Request;
+use App\Model\Usuario;
+use App\Model\Partida;
 
 class UsuarioController extends Controller
 {
-    /**
-     * UsuarioController constructor.
-     *
-     * @param Usuario $model
-     */
-    public function __construct(Usuario $model)
+    // private $model;
+    // /**
+    //  * UsuarioController constructor.
+    //  *
+    //  * @param Usuario $model
+    //  */
+    // public function __construct(Usuario $model)
+    // {
+    //     $this->$model = $model;
+    // }
+
+    // /**
+    //  * Show the profile for a given user.
+    //  *
+    //  * @param  int  $id
+    //  * @return \Illuminate\View\View
+    //  */
+
+    public function pregunta1(Request $request)
     {
-        parent::__construct($model);
-    }
-
-    /**
-     * Show the profile for a given user.
-     *
-     * @param  int  $id
-     * @return \Illuminate\View\View
-     */
-
-    public function pregunta1($acepto)
-    {
-
-        $usuarios = $this->model->select(['*'])
+        $acepto = $request;
+        $usuarios = Usuario::select(['*'])
                     ->leftJoin('partidas','partidas.idJugador','=','usuarios.id')
                     ->where('Acepto','=',$acepto)
                     ->limit(10);
+        echo $usuarios;
     }
 
-    public function pregunta2($id)
+    public function pregunta2(Request $request)
     {
-        $usuariosFecha = $this->model->select(['*'])
+        $fecha1 = $request;
+        $fecha1 =  $request;
+        $letra = $request;
+        $usuariosFecha = Usuario::select(['*'])
                         ->whereBetween('fechaRegistro',[$fecha1,$fecha2])
                         ->where('Nombre','like',$letra.'%')->count();
-        $usuariosAll = $this->model->count();
+        $usuariosAll = Usuario::count();
         $porcentaje = $usuariosFecha*100/$usuariosAll;
+        echo $porcentaje;
     }
 
-    public function pregunta3($id)
+    public function pregunta3(Request $request)
     {
-        $usuarios = $this->model->select(['*']->where('idDisfraz ','=',$idDisfraz))
-                            ->orderByRaw('SUM(puntos) DESC')->limit(10)
+        $idDisfraz = $request;
+        $usuarios = Usuario::select(['*']->where('idDisfraz ','=',$idDisfraz))
+                            ->orderByRaw('SUM(puntos) DESC')->limit(10);
+        echo $usuarios;
     }
 
-    public function pregunta4($id)
+    public function pregunta4(Request $request)
     {
+
         $tiempoGlobal = 0;
-        $totalpartidas = Partida::count();
+        $totalpartidas = Partida::select('*')->count();
         $partida = Partida::select('fechaInicio','fechaFin');
         foreach ($partida as $value) {
             $tiempo = new \Carbon\Carbon($value['fechaInicio']) - new \Carbon\Carbon($value['fechaInicio']);
             $tiempoGlobal = $tiempoGlobal + $tiempo;
         }
         $promedio = $tiempoGlobal/$totalpartidas;
-        
+        echo $promedio;
     }
 }
